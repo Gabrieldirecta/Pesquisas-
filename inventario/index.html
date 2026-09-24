@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Inventário de Atividades · Directa</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Figtree:wght@400;500;600;800&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#F4F1EC;--card:#fff;--ink:#1F2A44;--muted:#5A6070;--line:#E3DED5;--accent:#E8833A;--accent-ink:#fff;--ok:#2E8B57;--err:#C0392B;
+box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#141A2A;--card:#1E2638;--ink:#EEF0F5;--muted:#A3AABB;--line:#2E3850}}
+:root[data-theme="dark"]{--bg:#141A2A;--card:#1E2638;--ink:#EEF0F5;--muted:#A3AABB;--line:#2E3850}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*,*::before,*::after{box-sizing:inherit}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:Figtree,system-ui,-apple-system,"Segoe UI",sans-serif;font-size:16px;line-height:1.5}
+.wrap{max-width:760px;margin:0 auto;padding:24px 16px 80px}
+header{padding:28px 0 12px;border-bottom:4px solid var(--accent);margin-bottom:24px}
+h1{font-size:clamp(28px,6vw,40px);line-height:1.1;margin:0 0 10px;font-weight:800;letter-spacing:-.02em}
+header p{margin:0;color:var(--muted);max-width:62ch}
+section{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:22px 20px;margin-bottom:18px}
+h2{font-size:20px;margin:0 0 4px}
+.hint{color:var(--muted);font-size:14px;margin:0 0 16px}
+label{display:block;font-weight:600;font-size:14px;margin:14px 0 6px}
+input,select,textarea{width:100%;font:inherit;color:var(--ink);background:var(--bg);border:1px solid var(--line);border-radius:9px;padding:10px 12px}
+textarea{min-height:80px;resize:vertical}
+input:focus,select:focus,textarea:focus{outline:2px solid var(--accent);outline-offset:1px}
+.row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+@media(max-width:560px){.row{grid-template-columns:1fr}}
+.act{border:1px solid var(--line);border-left:4px solid var(--accent);border-radius:10px;padding:14px;margin-bottom:14px;background:var(--bg)}
+.act input,.act select,.act textarea{background:var(--card)}
+.acthead{display:flex;justify-content:space-between;align-items:center}
+.acthead strong{font-size:15px}
+.rm{background:none;border:none;color:var(--err);font:inherit;font-size:14px;cursor:pointer}
+button.main{background:var(--accent);color:var(--accent-ink);border:none;border-radius:10px;padding:14px 22px;font:inherit;font-weight:700;font-size:16px;cursor:pointer;width:100%}
+button.sec{background:none;border:2px dashed var(--line);color:var(--ink);border-radius:10px;padding:12px;font:inherit;font-weight:600;width:100%;cursor:pointer}
+button:disabled{opacity:.5;cursor:default}
+.scale{display:flex;gap:8px;flex-wrap:wrap}
+.scale label{margin:0;font-weight:500;border:1px solid var(--line);border-radius:9px;padding:8px 12px;cursor:pointer;display:flex;gap:6px;align-items:center}
+.scale input{width:auto}
+#status{margin-top:12px;font-weight:600;text-align:center}
+.ok{color:var(--ok)}.bad{color:var(--err)}
+.total{font-size:14px;color:var(--muted);margin-top:6px}
+</style>
+</head>
+<body>
+<div class="wrap">
+<header>
+<h1>Inventário de atividades</h1>
+<p>Queremos entender o dia a dia de cada pessoa da Directa para distribuir melhor o trabalho, tirar sobrecarga e definir onde a IA pode ajudar. Não é avaliação nem cobrança: é um retrato de como trabalhamos hoje. Leva cerca de 20 minutos. Suas respostas ficam visíveis só para a diretoria.</p>
+</header>
+
+<section>
+<h2>Sobre você</h2>
+<label for="codigo">Código da empresa (veio na mensagem)</label><input id="codigo">
+<div class="row">
+<div><label for="nome">Nome</label><input id="nome"></div>
+<div><label for="cargo">Cargo ou função</label><input id="cargo"></div>
+</div>
+<div class="row">
+<div><label for="area">Área principal</label>
+<select id="area"><option value="">Selecione</option><option>Gestão</option><option>Marketing</option><option>Operações</option><option>Administrativo lojas próprias</option><option>RH/DP</option><option>Jurídico</option><option>Centro de distribuição</option><option>Outra</option></select></div>
+<div><label for="responde">A quem você responde?</label><input id="responde" placeholder="Pode ser mais de uma pessoa"></div>
+</div>
+</section>
+
+<section>
+<h2>Suas atividades</h2>
+<p class="hint">Liste tudo o que você faz, inclusive as tarefas pequenas e as que "caíram" com você. Uma linha por atividade.</p>
+<div id="acts"></div>
+<button class="sec" id="add" type="button">+ Adicionar atividade</button>
+</section>
+
+<section>
+<h2>Carga e gargalos</h2>
+<label>Como está sua carga de trabalho hoje?</label>
+<div class="scale" id="carga"></div>
+<label for="gargalo">O que mais trava ou atrasa seu trabalho?</label><textarea id="gargalo"></textarea>
+<label for="naominha">Existe alguma tarefa que você faz e que deveria ser de outra pessoa ou área?</label><textarea id="naominha"></textarea>
+<label for="falta">Que informação ou ferramenta mais faz falta para você?</label><textarea id="falta"></textarea>
+<label for="sugestao">Se você pudesse mudar um processo da empresa, qual seria?</label><textarea id="sugestao"></textarea>
+</section>
+
+<button class="main" id="enviar" type="button">Enviar respostas</button>
+<div id="status" role="status"></div>
+</div>
+
+<script>
+const FREQ=["Diária","Várias vezes por semana","Semanal","Quinzenal","Mensal","Eventual"];
+const TEMPO=["Rápida (até 15 min)","Média (até 1 hora)","Longa (mais de 1 hora)"];
+const AUTO=["Sim","Talvez","Não"];
+const FACTOR={"Diária":22,"Várias vezes por semana":12,"Semanal":4.3,"Quinzenal":2,"Mensal":1,"Eventual":0.5};
+const CARGA=["Tranquila","Adequada","Puxada","Sobrecarregada","Insustentável"];
+const $=id=>document.getElementById(id);
+const acts=$("acts");
+function el(t,a={},...k){const e=document.createElement(t);for(const[x,y]of Object.entries(a))e.setAttribute(x,y);k.forEach(c=>e.append(c));return e}
+function sel(opts,v){const s=el("select");s.append(el("option",{value:""},"Selecione"));opts.forEach(o=>{const op=el("option",{},o);if(o===v)op.selected=true;s.append(op)});return s}
+function field(lbl,input,key){input.dataset.k=key;return el("div",{},el("label",{},lbl),input)}
+function addAct(d={}){
+  const box=el("div",{class:"act"});
+  const rm=el("button",{class:"rm",type:"button"},"Remover");rm.onclick=()=>{box.remove();renum()};
+  const i=v=>{const x=el("input");x.value=v||"";return x};
+  const tit=i(d.titulo);tit.placeholder="Ex.: Conferência de caixa diário";
+  const desc=el("textarea");desc.value=d.descricao||"";desc.style.minHeight="56px";desc.placeholder="Descreva o que você faz nessa atividade, passo a passo se possível";
+  const auto=sel(AUTO,d.automatizavel);
+  const como=el("textarea");como.value=d.como||"";como.style.minHeight="56px";como.placeholder="Ex.: o sistema poderia puxar os dados sozinho, eu só conferiria as diferenças";
+  const comoBox=field("Como você acha que ela poderia ser automatizada ou simplificada?",como,"como");
+  const sync=()=>{comoBox.style.display=(auto.value==="Sim"||auto.value==="Talvez")?"":"none"};
+  auto.addEventListener("change",sync);
+  tit.addEventListener("input",renum);
+  box.append(el("div",{class:"acthead"},el("strong",{}),rm),
+    field("Título da atividade",tit,"titulo"),
+    field("O que você faz nela?",desc,"descricao"),
+    el("div",{class:"row"},field("Frequência",sel(FREQ,d.frequencia),"frequencia"),field("Quanto tempo leva cada vez?",sel(TEMPO,d.tempo),"tempo")),
+    el("div",{class:"row"},field("Ferramenta ou canal usado",i(d.ferramenta),"ferramenta"),field("Depende de quem para fazer?",i(d.depende),"depende")),
+    el("div",{class:"row"},field("Entrega o resultado para quem?",i(d.entrega),"entrega"),field("Poderia ser automatizada ou simplificada?",auto,"automatizavel")),
+    comoBox);
+  sync();acts.append(box);renum();
+}
+function renum(){[...acts.children].forEach((b,n)=>{const t=b.querySelector('[data-k="titulo"]').value.trim();b.querySelector("strong").textContent="Atividade "+(n+1)+(t?": "+t:"")})}
+function readActs(){return [...acts.children].map(b=>{const o={};b.querySelectorAll("[data-k]").forEach(x=>o[x.dataset.k]=x.value.trim());return o}).filter(a=>a.titulo||a.descricao).map(a=>{if(a.automatizavel!=="Sim"&&a.automatizavel!=="Talvez")a.como="";return a})}
+CARGA.forEach((c,n)=>{const r=el("input",{type:"radio",name:"carga",value:String(n+1)});$("carga").append(el("label",{},r,c))});
+$("add").onclick=()=>addAct();
+for(let n=0;n<5;n++)addAct();
+
+const ENDPOINT="https://script.google.com/macros/s/AKfycbzm7MPZ-Yqkny6kUc9KFC92PgNCrueplJ0I0V3_XbdlnKVMZofPgprWuda2wSCdkZ8Lrw/exec";
+function collect(){return{codigo:$("codigo").value.trim(),nome:$("nome").value.trim(),cargo:$("cargo").value.trim(),area:$("area").value,responde:$("responde").value.trim(),
+atividades:readActs(),carga:(document.querySelector('input[name=carga]:checked')||{}).parentNode?.textContent||"",gargalo:$("gargalo").value.trim(),naoMinha:$("naominha").value.trim(),falta:$("falta").value.trim(),sugestao:$("sugestao").value.trim()}}
+const st=(t,c)=>{$("status").textContent=t;$("status").className=c||""};
+$("enviar").onclick=async()=>{
+  const d=collect();
+  if(!d.codigo){st("Informe o código da empresa que veio na mensagem.","bad");return}
+  if(!d.nome||!d.area){st("Preencha pelo menos seu nome e sua área.","bad");return}
+  if(!d.atividades.length){st("Liste pelo menos uma atividade.","bad");return}
+  $("enviar").disabled=true;st("Enviando...");
+  try{
+    await fetch(ENDPOINT,{method:"POST",mode:"no-cors",headers:{"Content-Type":"text/plain;charset=utf-8"},body:JSON.stringify(d)});
+    st("Respostas enviadas. Obrigado!","ok");
+    document.querySelectorAll("input,select,textarea,button").forEach(e=>e.disabled=true);
+  }catch(e){st("Não foi possível enviar. Verifique a internet e tente de novo.","bad");$("enviar").disabled=false}
+};
+</script>
+</body>
+</html>

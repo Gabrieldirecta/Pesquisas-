@@ -40,7 +40,6 @@ button:disabled{opacity:.5;cursor:default}
 .scale input{width:auto}
 #status{margin-top:12px;font-weight:600;text-align:center}
 .ok{color:var(--ok)}.bad{color:var(--err)}
-.total{font-size:14px;color:var(--muted);margin-top:6px}
 </style>
 </head>
 <body>
@@ -52,7 +51,6 @@ button:disabled{opacity:.5;cursor:default}
 
 <section>
 <h2>Sobre você</h2>
-<label for="codigo">Código da empresa (veio na mensagem)</label><input id="codigo">
 <div class="row">
 <div><label for="nome">Nome</label><input id="nome"></div>
 <div><label for="cargo">Cargo ou função</label><input id="cargo"></div>
@@ -89,7 +87,6 @@ button:disabled{opacity:.5;cursor:default}
 const FREQ=["Diária","Várias vezes por semana","Semanal","Quinzenal","Mensal","Eventual"];
 const TEMPO=["Rápida (até 15 min)","Média (até 1 hora)","Longa (mais de 1 hora)"];
 const AUTO=["Sim","Talvez","Não"];
-const FACTOR={"Diária":22,"Várias vezes por semana":12,"Semanal":4.3,"Quinzenal":2,"Mensal":1,"Eventual":0.5};
 const CARGA=["Tranquila","Adequada","Puxada","Sobrecarregada","Insustentável"];
 const $=id=>document.getElementById(id);
 const acts=$("acts");
@@ -124,12 +121,11 @@ $("add").onclick=()=>addAct();
 for(let n=0;n<5;n++)addAct();
 
 const ENDPOINT="https://script.google.com/macros/s/AKfycbzm7MPZ-Yqkny6kUc9KFC92PgNCrueplJ0I0V3_XbdlnKVMZofPgprWuda2wSCdkZ8Lrw/exec";
-function collect(){return{codigo:$("codigo").value.trim(),nome:$("nome").value.trim(),cargo:$("cargo").value.trim(),area:$("area").value,responde:$("responde").value.trim(),
+function collect(){return{nome:$("nome").value.trim(),cargo:$("cargo").value.trim(),area:$("area").value,responde:$("responde").value.trim(),
 atividades:readActs(),carga:(document.querySelector('input[name=carga]:checked')||{}).parentNode?.textContent||"",gargalo:$("gargalo").value.trim(),naoMinha:$("naominha").value.trim(),falta:$("falta").value.trim(),sugestao:$("sugestao").value.trim()}}
 const st=(t,c)=>{$("status").textContent=t;$("status").className=c||""};
 $("enviar").onclick=async()=>{
   const d=collect();
-  if(!d.codigo){st("Informe o código da empresa que veio na mensagem.","bad");return}
   if(!d.nome||!d.area){st("Preencha pelo menos seu nome e sua área.","bad");return}
   if(!d.atividades.length){st("Liste pelo menos uma atividade.","bad");return}
   $("enviar").disabled=true;st("Enviando...");
